@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureAttend - Biometric Attendance System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1200px;
+            width: 100%;
+            min-height: 600px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .left-panel {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: white;
+        }
+
+        .right-panel {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .security-features {
+            list-style: none;
+        }
+
+        .security-features li {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .security-features li::before {
+            content: "🔒";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .form-container {
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .fingerprint-scanner {
+            text-align: center;
+            padding: 30px;
+            border: 3px dashed #4facfe;
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+        }
+
+        .fingerprint-scanner:hover {
+            border-color: #2196F3;
+            background: linear-gradient(135deg, #e6f3ff 0%, #cce7ff 100%);
+        }
+
+        .fingerprint-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .location-status {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: 500;
+        }
+
+        .location-verified {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border-left: 5px solid #4caf50;
+        }
+
+        .location-pending {
+            background: #fff3e0;
+            color: #f57c00;
+            border-left: 5px solid #ff9800;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+
+        .attendance-records {
+            margin-top: 30px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .record {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .record-header {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .record-details {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+            
+            .left-panel {
+                padding: 30px 20px;
+            }
+            
+            .right-panel {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">🔐 SecureAttend</div>
+            <div class="subtitle">Advanced Biometric Attendance System</div>
+            <ul class="security-features">
+                <li>Fingerprint Authentication</li>
+                <li>GPS Location Verification</li>
+                <li>Real-time Attendance Tracking</li>
+                <li>Anti-spoofing Protection</li>
+                <li>Encrypted Data Storage</li>
+            </ul>
+        </div>
+        
+        <div class="right-panel">
+            <div class="form-container">
+                <h2 class="form-title">Mark Attendance</h2>
+                
+                <form id="attendanceForm">
+                    <div class="form-group">
+                        <label for="employeeId">Employee ID</label>
+                        <input type="text" id="employeeId" required placeholder="Enter your ID">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="employeeName">Full Name</label>
+                        <input type="text" id="employeeName" required placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" required>
+                            <option value="">Select Department</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="HR">Human Resources</option>
+                            <option value="Finance">Finance</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Operations">Operations</option>
+                        </select>
+                    </div>
+                    
+                    <div class="fingerprint-scanner" id="fingerprintScanner">
+                        <span class="fingerprint-icon">👆</span>
+                        <div>Click to Scan Fingerprint</div>
+                        <small>Place your finger on the scanner</small>
+                    </div>
+                    
+                    <div class="location-status" id="locationStatus">
+                        <span>📍 Detecting location...</span>
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submitBtn" disabled>
+                        Mark Attendance
+                    </button>
+                </form>
+                
+                <div id="statusMessage"></div>
+                
+                <div class="attendance-records" id="attendanceRecords">
+                    <h3>Recent Attendance Records</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fingerprintScanned = false;
+        let locationVerified = false;
+        let userLocation = null;
+        let attendanceRecords = [];
+
+        // Office coordinates (example: replace with actual office location)
+        const OFFICE_COORDINATES = {
+            lat: 31.5128,
+            lng: 74.3278 // Lahore coordinates as example
+        };
+        const ALLOWED_RADIUS = 3000; // meters
+
+        // Initialize the system
+        document.addEventListener('DOMContentLoaded', function() {
+            getLocation();
+            loadAttendanceRecords();
+        });
+
+        // Fingerprint scanner simulation
+        document.getElementById('fingerprintScanner').addEventListener('click', function() {
+            const scanner = this;
+            scanner.style.background = 'linear-gradient(135deg, #ffecb3 0%, #ffe082 100%)';
+            scanner.innerHTML = '<span class="fingerprint-icon">⏳</span><div>Scanning...</div><small>Please wait</small>';
+            
+            setTimeout(() => {
+                const success = Math.random() > 0.1; // 90% success rate
+                if (success) {
+                    fingerprintScanned = true;
+                    scanner.style.background = 'linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%)';
+                    scanner.innerHTML = '<span class="fingerprint-icon">✅</span><div>Fingerprint Verified</div><small>Authentication successful</small>';
+                } else {
+                    scanner.style.background = 'linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%)';
+                    scanner.innerHTML = '<span class="fingerprint-icon">❌</span><div>Scan Failed</div><small>Please try again</small>';
+                    setTimeout(() => {
+                        scanner.style.background = 'linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%)';
+                        scanner.innerHTML = '<span class="fingerprint-icon">👆</span><div>Click to Scan Fingerprint</div><small>Place your finger on the scanner</small>';
+                    }, 2000);
+                }
+                updateSubmitButton();
+            }, 2000);
+        });
+
+        // Get user location
+        function getLocation() {
+            const locationStatus = document.getElementById('locationStatus');
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        const distance = calculateDistance(
+                            userLocation.lat, userLocation.lng,
+                            OFFICE_COORDINATES.lat, OFFICE_COORDINATES.lng
+                        );
+                        
+                        if (distance <= ALLOWED_RADIUS) {
+                            locationVerified = true;
+                            locationStatus.className = 'location-status location-verified';
+                            locationStatus.innerHTML = '✅ Location Verified - You are at the office';
+                        } else {
+                            locationStatus.className = 'location-status location-pending';
+                            locationStatus.innerHTML = `❌ Location Invalid - You are ${Math.round(distance)}m from office`;
+                        }
+                        updateSubmitButton();
+                    },
+                    function() {
+                        locationStatus.className = 'location-status location-pending';
+                        locationStatus.innerHTML = '⚠️ Location access denied - Please enable GPS';
+                    }
+                );
+            } else {
+                locationStatus.className = 'location-status location-pending';
+                locationStatus.innerHTML = '❌ Geolocation not supported by this browser';
+            }
+        }
+
+        // Calculate distance between two coordinates
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371e3; // Earth's radius in meters
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            return R * c;
+        }
+
+        // Update submit button state
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const employeeId = document.getElementById('employeeId').value;
+            const employeeName = document.getElementById('employeeName').value;
+            const department = document.getElementById('department').value;
+            
+            const canSubmit = fingerprintScanned && locationVerified && 
+                            employeeId && employeeName && department;
+            
+            submitBtn.disabled = !canSubmit;
+            if (canSubmit) {
+                submitBtn.style.background = 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)';
+                submitBtn.textContent = 'Mark Attendance ✓';
+            }
+        }
+
+        // Form validation
+        document.getElementById('employeeId').addEventListener('input', updateSubmitButton);
+        document.getElementById('employeeName').addEventListener('input', updateSubmitButton);
+        document.getElementById('department').addEventListener('change', updateSubmitButton);
+
+        // Handle form submission
+        document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const employeeId = document.getElementById('employeeId').value;
+            const employeeName = document.getElementById('employeeName').value;
+            const department = document.getElementById('department').value;
+            const timestamp = new Date().toLocaleString();
+            
+            // Check for duplicate attendance today
+            const today = new Date().toDateString();
+            const todayRecords = attendanceRecords.filter(record => 
+                new Date(record.timestamp).toDateString() === today && 
+                record.employeeId === employeeId
+            );
+            
+            if (todayRecords.length > 0) {
+                showMessage('You have already marked attendance today!', 'error');
+                return;
+            }
+            
+            // Create attendance record
+            const record = {
+                employeeId,
+                employeeName,
+                department,
+                timestamp,
+                location: `${userLocation.lat.toFixed(6)}, ${userLocation.lng.toFixed(6)}`,
+                fingerprintId: generateFingerprintId()
+            };
+            
+            attendanceRecords.unshift(record);
+            saveAttendanceRecords();
+            displayAttendanceRecords();
+            
+            showMessage('Attendance marked successfully! ✓', 'success');
+            
+            // Reset form
+            document.getElementById('attendanceForm').reset();
+            fingerprintScanned = false;
+            locationVerified = false;
+            
+            // Reset fingerprint scanner
+            const scanner = document.getElementById('fingerprintScanner');
+            scanner.style.background = 'linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%)';
+            scanner.innerHTML = '<span class="fingerprint-icon">👆</span><div>Click to Scan Fingerprint</div><small>Place your finger on the scanner</small>';
+            
+            updateSubmitButton();
+            getLocation(); // Re-verify location
+        });
+
+        // Generate unique fingerprint ID
+        function generateFingerprintId() {
+            return 'FP' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        // Show status message
+        function showMessage(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = '';
+            }, 5000);
+        }
+
+        // Load attendance records from memory
+        function loadAttendanceRecords() {
+            // In a real system, this would load from a database
+            displayAttendanceRecords();
+        }
+
+        // Save attendance records to memory
+        function saveAttendanceRecords() {
+            // In a real system, this would save to a database
+            // For demo purposes, we're just keeping them in memory
+        }
+
+        // Display attendance records
+        function displayAttendanceRecords() {
+            const recordsContainer = document.getElementById('attendanceRecords');
+            const recentRecords = attendanceRecords.slice(0, 5);
+            
+            let html = '<h3>Recent Attendance Records</h3>';
+            
+            if (recentRecords.length === 0) {
+                html += '<p style="text-align: center; color: #666; margin-top: 20px;">No records yet</p>';
+            } else {
+                recentRecords.forEach(record => {
+                    html += `
+                        <div class="record">
+                            <div class="record-header">${record.employeeName} (${record.employeeId})</div>
+                            <div class="record-details">
+                                📅 ${record.timestamp}<br>
+                                🏢 ${record.department}<br>
+                                📍 Location verified<br>
+                                🔐 Fingerprint: ${record.fingerprintId}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            recordsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
